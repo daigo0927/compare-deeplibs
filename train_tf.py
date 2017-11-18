@@ -9,10 +9,7 @@ import tensorflow.contrib.layers as tcl
 
 import os, sys
 sys.path.append(os.pardir)
-from ResNet_tf.model import ResNetBuilder
-from Sonnet.train import build_simpleCNN
-from layers.blocks import bn_relu_conv
-from misc.utils import load_cifar10, load_cifar100
+from utils import load_cifar10, load_cifar100
 
 class CNN(object):
     def __init__(self,
@@ -23,7 +20,6 @@ class CNN(object):
 
     def __call__(self, inputs, reuse = True):
         with tf.variable_scope(self.name) as vs:
-            # tf.get_variable_scope()
             if reuse:
                 vs.reuse_variables()
 
@@ -73,10 +69,8 @@ class Trainer(object):
         self.labels = tf.placeholder(tf.float32,
                                      shape = (None, 10), name = 'labels')
 
-        self.net = build_simpleCNN()
-        # self.logits = self.net(self.images)
-        # self.net = CNN(num_output = 10)
-        self.logits = self.net(self.images)#, reuse = False)
+        self.net = CNN(num_output = 10)
+        self.logits = self.net(self.images, reuse = False)
 
         self.loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
             labels = self.labels, logits = self.logits))
@@ -162,8 +156,8 @@ if __name__ == '__main__':
     # optimization
     parser.add_argument('-e', '--epochs', type = int, default = 20,
                         help = 'number of epochs [20]')
-    parser.add_argument('-b', '--batch_size', type = int, default = 64,
-                        help = 'size of mini-batch [64]')
+    parser.add_argument('-b', '--batch_size', type = int, default = 128,
+                        help = 'size of mini-batch [128]')
     parser.add_argument('-g', '--gpu_id', type = str, required = True,
                         help = 'utilize gpu number')
     args = parser.parse_args()

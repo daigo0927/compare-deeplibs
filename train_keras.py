@@ -22,11 +22,11 @@ def cnn(image_size = 32, num_output = 10):
     w = int(image_size)
 
     inputs = Input(shape = (w, w, 3))
-    x = Conv2D(64, (4, 4), strides = (1, 1), padding = 'same')(inputs)
+    x = Conv2D(64, (5, 5), strides = (1, 1), padding = 'same')(inputs)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
     x = MaxPooling2D((2, 2))(x)
-    x = Conv2D(128, (4, 4), strides = (1, 1), padding = 'same')(x)
+    x = Conv2D(128, (5, 5), strides = (1, 1), padding = 'same')(x)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
     x = MaxPooling2D((2, 2))(x)
@@ -103,10 +103,12 @@ class Trainer(object):
                 f.write(',' + str(lap))
             f.write('\n')
 
-def train_keras(epochs, batch_size):
+def train_keras(epochs, batch_size, gpu_id):
 
     if not os.path.exists('./model_keras'):
         os.mkdir('./model_keras')
+
+    os.environ(['CUDA_VISIBLE_DEVICES']) = gpu_id
 
     trainer = Trainer()
     trainer.train(num_epochs = epochs,
@@ -119,6 +121,8 @@ if __name__ == '__main__':
                         help = 'number of epochs [20]')
     parser.add_argument('-b', '--batch_size', type = int, default = 64,
                         help = 'size of mini-batch [64]')
+    parser.add_argument('-g', '--gpu_id', type = str, required = True,
+                        help = 'utilize gpu number')
     args = parser.parse_args()
 
     for key, value in vars(args).items():

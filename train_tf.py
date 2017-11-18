@@ -18,14 +18,12 @@ class CNN(object):
         self.num_output = num_output
         self.name = name
 
-    def __call__(self, inputs, reuse = True):
+    def __call__(self, inputs):
         with tf.variable_scope(self.name) as vs:
-            if reuse:
-                vs.reuse_variables()
 
             x = tcl.conv2d(inputs,
                            num_outputs = 64,
-                           kernel_size = (4, 4),
+                           kernel_size = (5, 5),
                            stride = (1, 1),
                            padding = 'SAME')
             x = tcl.batch_norm(x)
@@ -33,15 +31,15 @@ class CNN(object):
             x = tcl.max_pool2d(x, (2, 2), (2, 2), 'SAME')
             x = tcl.conv2d(x,
                            num_outputs = 128,
-                           kernel_size = (4, 4),
+                           kernel_size = (5, 5),
                            stride = (1, 1),
                            padding = 'SAME')
             x = tcl.batch_norm(x)
             x = tf.nn.relu(x)
             x = tcl.max_pool2d(x, (2, 2), (2, 2), 'SAME')
             x = tcl.flatten(x)
-            logits = tcl.fully_connected(x, num_outputs = self.num_output)
-
+            logits = tcl.fully_connected(x, num_outputs = self.num_output,
+                                         activation_fn = None)
             return logits
 
     @property
@@ -70,7 +68,7 @@ class Trainer(object):
                                      shape = (None, 10), name = 'labels')
 
         self.net = CNN(num_output = 10)
-        self.logits = self.net(self.images, reuse = False)
+        self.logits = self.net(self.images)
 
         self.loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
             labels = self.labels, logits = self.logits))
@@ -79,7 +77,7 @@ class Trainer(object):
         self.accuracy = tf.reduce_mean(tf.reduce_sum(self.labels*self.preds, axis = 1))
         
         self.opt = tf.train.AdamOptimizer()\
-                           .minimize(self.loss)# , var_list = self.net.vars)
+                           .minimize(self.loss, var_list = self.net.vars)
 
         self.saver = tf.train.Saver()
         self.sess.run(tf.global_variables_initializer())

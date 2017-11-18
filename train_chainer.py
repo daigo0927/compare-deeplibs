@@ -135,10 +135,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-e', '--epochs', type = int, default = 20,
                         help = 'number of epochs [20]')
-    parser.add_argument('-b', '--batch_size', type = int, default = 64,
-                        help = 'size of mini-batch [64]')
+    parser.add_argument('-b', '--batch_size', type = int, default = 128,
+                        help = 'size of mini-batch [128]')
     parser.add_argument('-g', '--gpu_id', type = int, default = None,
-                        help = 'utilize gpu [None]')
+                        help = 'utilize gpu_id [None]')
     args = parser.parse_args()
 
     for key, value in vars(args).items():

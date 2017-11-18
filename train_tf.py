@@ -75,11 +75,6 @@ class Trainer(object):
 
         self.net = build_simpleCNN()
         # self.logits = self.net(self.images)
-        # self.net = ResNetBuilder.build_resnet18(num_output = 100)
-        # self.net = ResNetBuilder.build_resnet18(num_output = 10)
-        # self.net = ResNetBuilder.build(num_output = 10,
-        #                                block_fn = 'plain',
-        #                                repetitions = [2, 0, 0, 0])
         # self.net = CNN(num_output = 10)
         self.logits = self.net(self.images)#, reuse = False)
 

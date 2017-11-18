@@ -1,9 +1,12 @@
-# Compare Deep Learning libraries
-- tensorflow 
+# compareing popular Deep Learning libraries
+- tensorflow
 - keras
 - pytorch
 - chainer
 
-Compare each libraries in the forward-backward speed.
+compare learning speed of each libraries, by training ResNet-18
 
-There may be more smart training script, glad to see that. Best regards!
+## main environment
+- python 3.5
+- tensorflow 1.1.0
+

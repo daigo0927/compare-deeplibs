@@ -111,7 +111,8 @@ class Trainer(object):
             print('{} epoch validation accuracy {}'.format(e, np.mean(accs_val)))
 
             # save trained model
-            serializers.save_npz('model_chainer.model', self.net)
+            serializers.save_npz('./model_chiainer/chainer{}.model'.format(e),
+                                 self.net)
 
         with open('./lap_record.csv', 'a') as f:
             f.write('chainer')
@@ -121,8 +122,8 @@ class Trainer(object):
 
 def train_chainer(epochs, batch_size, gpu_id):
 
-    if not os.path.exists('./model_keras'):
-        os.mkdir('./model_keras')
+    if not os.path.exists('./model_chainer'):
+        os.mkdir('./model_chainer')
 
     trainer = Trainer()
     trainer.train(num_epochs = epochs,

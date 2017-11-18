@@ -1,7 +1,6 @@
 # conding:utf-8
 
 import os, sys
-sys.path.append(os.pardir)
 import time
 import argparse
 
@@ -15,7 +14,7 @@ from keras.layers.normalization import BatchNormalization
 from keras.layers.convolutional import Conv2D
 from keras.optimizers import Adam
 
-from misc.utils import load_cifar10, load_cifar100
+from utils import load_cifar10, load_cifar100
 
 def cnn(image_size = 32, num_output = 10):
 
@@ -108,7 +107,7 @@ def train_keras(epochs, batch_size, gpu_id):
     if not os.path.exists('./model_keras'):
         os.mkdir('./model_keras')
 
-    os.environ(['CUDA_VISIBLE_DEVICES']) = gpu_id
+    os.environ['CUDA_VISIBLE_DEVICES'] = gpu_id
 
     trainer = Trainer()
     trainer.train(num_epochs = epochs,

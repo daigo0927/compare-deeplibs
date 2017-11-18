@@ -1,10 +1,9 @@
 # conding:utf-8
 
 import os, sys
-sys.path.append(os.pardir)
 import time
 import argparse
-from misc.utils import load_cifar10, load_cifar100
+from utils import load_cifar10, load_cifar100
 
 import numpy as np
 
@@ -54,22 +53,22 @@ class Trainer(object):
     def _load_cifar100(self):
         (self.x_train, self.y_train), (self.x_test, self.y_test) =\
                                         load_cifar100(to_categoric = False)
-        self.x_train = x_train.astype('f')
+        self.x_train = np.transpose(x_train.astype('f'), (0, 3, 1, 2))
         self.y_train = y_train.flatten().astype('i')
-        self.x_test = x_test.astype('f')
+        self.x_test = np.transpose(x_test.astype('f'), (0, 3, 1, 2))
         self.y_test = y_test.flatten().astype('i')
 
     def train(self,
               num_epochs,
               batch_size,
-              gpu):
+              gpu_id):
 
-        if gpu is not None:
-            self.net.to_gpu(gpu)
-            self.x_train = to_gpu(self.x_train, gpu)
-            self.y_train = to_gpu(self.y_train, gpu)
-            self.x_test = to_gpu(self.x_test, gpu)
-            self.y_test = to_gpu(self.y_test, gpu)
+        if gpu_id is not None:
+            self.net.to_gpu(gpu_id)
+            self.x_train = to_gpu(self.x_train, gpu_id)
+            self.y_train = to_gpu(self.y_train, gpu_id)
+            self.x_test = to_gpu(self.x_test, gpu_id)
+            self.y_test = to_gpu(self.y_test, gpu_id)
 
         num_batches = int(len(self.x_train)/batch_size)
         print('epochs : {}, number of batches : {}'\
@@ -120,7 +119,7 @@ class Trainer(object):
                 f.write(',' + str(lap))
             f.write('\n')
 
-def train_chainer(epochs, batch_size, gpu):
+def train_chainer(epochs, batch_size, gpu_id):
 
     if not os.path.exists('./model_keras'):
         os.mkdir('./model_keras')
@@ -128,7 +127,7 @@ def train_chainer(epochs, batch_size, gpu):
     trainer = Trainer()
     trainer.train(num_epochs = epochs,
                   batch_size = batch_size,
-                  gpu = gpu)
+                  gpu_id = gpu_id)
 
 if __name__ == '__main__':
 
@@ -137,7 +136,7 @@ if __name__ == '__main__':
                         help = 'number of epochs [20]')
     parser.add_argument('-b', '--batch_size', type = int, default = 64,
                         help = 'size of mini-batch [64]')
-    parser.add_argument('-g', '--gpu', type = int, default = None,
+    parser.add_argument('-g', '--gpu_id', type = int, default = None,
                         help = 'utilize gpu [None]')
     args = parser.parse_args()
 

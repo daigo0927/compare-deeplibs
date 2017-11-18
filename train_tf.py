@@ -69,7 +69,6 @@ class Trainer(object):
         self.labels = tf.placeholder(tf.float32,
                                      shape = (None, 10), name = 'labels')
 
-
         self.net = CNN(num_output = 10)
         self.logits = self.net(self.images, reuse = False)
 

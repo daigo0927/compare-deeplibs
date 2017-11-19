@@ -1,5 +1,6 @@
 # coding:utf-8
 
+import sys
 import numpy as np
 import math
 import tensorflow as tf
@@ -20,7 +21,7 @@ def tf_image_label_concat(image, label,
     label_panel = tf.tile(label_, # shape(None, width, width, feature)
                           multiples = [1, image_size, image_size, 1])
     image_label = tf.concat((image, label_panel), axis = 3)
-    
+
     return image_label # shape(None, width, width, channel+feature)
 
 def load_cifar10(to_categoric = True):
@@ -54,7 +55,7 @@ def cifar10_extract(label = 'cat'):
     t_target = t_target.reshape(t_target.size)
 
     x_target = x_train[t_target]
-    
+
     print('extract {} labeled images, shape(5000, 32, 32, 3)'.format(label))
     return x_target
 
@@ -78,21 +79,26 @@ def combine_images(generated_images):
     return combined_image
 
 def get_image(filepath, image_target, image_size):
-    
+
     img = imread(filepath).astype(np.float)
     h_origin, w_origin = img.shape[:2]
 
     if image_target > h_origin or image_target > w_origin:
         image_target = min(h_origin, w_origin)
 
-    h_drop = int((h_origin - image_target)/2)    
+    h_drop = int((h_origin - image_target)/2)
     w_drop = int((w_origin - image_target)/2)
 
     if img.ndim == 2:
         img = np.tile(img.reshape(h_origin, w_origin, 1), (1,1,3))
-    
+
     img_crop = img[h_drop:h_drop+image_target, w_drop:w_drop+image_target, :]
-        
+
     img_resize = imresize(img_crop, [image_size, image_size])
 
     return np.array(img_resize)/127.5 - 1.
+
+def show_progress(e,b,b_total,loss,acc):
+    sys.stdout.write("\r%3d: [%5d / %5d] loss: %f acc: %f" % (e,b,b_total,loss,acc))
+    sys.stdout.flush()
+

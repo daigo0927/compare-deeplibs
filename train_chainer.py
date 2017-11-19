@@ -111,7 +111,7 @@ class Trainer(object):
             print('{} epoch validation accuracy {}'.format(e, np.mean(accs_val)))
 
             # save trained model
-            serializers.save_npz('./model_chiainer/chainer{}.model'.format(e),
+            serializers.save_npz('./model_chainer/chainer{}.model'.format(e),
                                  self.net)
 
         with open('./lap_record.csv', 'a') as f:

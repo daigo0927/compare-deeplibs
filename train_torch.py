@@ -63,10 +63,14 @@ def load_CIFAR10():
                                          shuffle=False, num_workers=1, pin_memory=True)
     return (trainloader, testloader)
 
+def accuracy(out, labels):
+    _, pred= torch.max(out.data, 1)
+    return (pred == labels).sum() / labels.size(0)
+
 def train():
     # load dataset
     # ==========================
-    trainloader, _ = load_CIFAR10()
+    trainloader, testloader = load_CIFAR10()
     N = len(trainloader)
     print('# of trainset: ', N)
 
@@ -97,17 +101,28 @@ def train():
             time_cum += time.time() - start
 
             loss_cum += loss.data[0]
-            # calc accuracy
-            _, pred= torch.max(outputs.data, 1)
-            total = labels.size(0)
-            correct = (pred == labels.data).sum()
-            acc_cum += correct/total
-            show_progress(epoch+1, i+1, N, loss.data[0], correct/total)
+            acc = accuracy(outputs, labels.data)
+            acc_cum += acc
+            show_progress(epoch+1, i+1, N, loss.data[0], acc)
 
         print('\t mean acc: %f' % (acc_cum/N))
         loss_history.append(loss_cum/N)
         acc_history.append(acc_cum/N)
         time_history.append(time_cum)
+
+    # test accuracy
+    cnn.eval()
+    correct, total = 0, 0
+    for imgs, labels in testloader:
+        imgs, labels = Variable(imgs.cuda()), labels.cuda()
+        outputs = cnn(imgs)
+        _, pred = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (pred == labels).sum()
+
+    print('======================')
+    print('epoch: %d  batch size: %d' % (opt.epochs, opt.batch_size))
+    print('mean accuracy on %d test images: %f' % (total, correct/total))
 
     # save histories
     # with open('./loss_pytorch.csv', 'w') as f:
@@ -127,6 +142,8 @@ def train():
         for t in time_history:
             f.write(',' + str(t))
         f.write('\n')
+    # save models
+    torch.save(cnn.state_dict(), 'model_torch.pth')
 
 if __name__ == '__main__':
     train()

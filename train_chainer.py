@@ -65,8 +65,6 @@ class Trainer(object):
 
         if gpu_id is not None:
             self.net.to_gpu(gpu_id)
-            self.x_train = to_gpu(self.x_train, gpu_id)
-            self.y_train = to_gpu(self.y_train, gpu_id)
             self.x_test = to_gpu(self.x_test, gpu_id)
             self.y_test = to_gpu(self.y_test, gpu_id)
 
@@ -84,6 +82,9 @@ class Trainer(object):
                 y_batch = self.y_train[permute_idx[b*batch_size:(b+1)*batch_size]]
 
                 s_time = time.time()
+                if gpu_id is not None:
+                    x_batch = to_gpu(x_batch, gpu_id)
+                    y_batch = to_gpu(y_batch, gpu_id)
                 logits = self.net(x_batch)
                 loss = F.softmax_cross_entropy(logits, y_batch)
                 self.net.cleargrads()

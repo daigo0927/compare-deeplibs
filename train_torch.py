@@ -90,10 +90,9 @@ def train():
         acc_cum = 0.0
         time_cum = 0.0
         for i, (imgs, labels) in enumerate(trainloader):
+            start = time.time()
             imgs, labels = Variable(imgs.cuda()), Variable(labels.cuda())
             cnn.zero_grad()
-
-            start = time.time()
             outputs = cnn(imgs)
             loss = criterion(outputs, labels)
             loss.backward()

@@ -64,8 +64,8 @@ def load_CIFAR10():
     return (trainloader, testloader)
 
 def accuracy(out, labels):
-    _, pred= torch.max(out.data, 1)
-    return (pred == labels).sum() / labels.size(0)
+    _, pred= torch.max(out, 1)
+    return (pred == labels).sum().item() / labels.size(0)
 
 def train():
     # load dataset
@@ -74,11 +74,13 @@ def train():
     N = len(trainloader)
     print('# of trainset: ', N)
 
+    device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
+
     cnn = CNN()
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(cnn.parameters())
-    cnn.cuda()
-    criterion.cuda()
+    cnn.to(device)
+    criterion.to(device)
 
     # train
     # ==========================
@@ -91,7 +93,7 @@ def train():
         time_cum = 0.0
         for i, (imgs, labels) in enumerate(trainloader):
             start = time.time()
-            imgs, labels = Variable(imgs.cuda()), Variable(labels.cuda())
+            imgs, labels = imgs.to(device), labels.to(device)
             cnn.zero_grad()
             outputs = cnn(imgs)
             loss = criterion(outputs, labels)
@@ -99,10 +101,10 @@ def train():
             optimizer.step()
             time_cum += time.time() - start
 
-            loss_cum += loss.data[0]
-            acc = accuracy(outputs, labels.data)
+            loss_cum += loss.item()
+            acc = accuracy(outputs, labels)
             acc_cum += acc
-            show_progress(epoch+1, i+1, N, loss.data[0], acc)
+            show_progress(epoch+1, i+1, N, loss.item(), acc)
 
         print('\t mean acc: %f' % (acc_cum/N))
         loss_history.append(loss_cum/N)
@@ -113,11 +115,11 @@ def train():
     cnn.eval()
     correct, total = 0, 0
     for imgs, labels in testloader:
-        imgs, labels = Variable(imgs.cuda()), labels.cuda()
+        imgs, labels = imgs.to(device), labels.to(device)
         outputs = cnn(imgs)
-        _, pred = torch.max(outputs.data, 1)
+        _, pred = torch.max(outputs, 1)
         total += labels.size(0)
-        correct += (pred == labels).sum()
+        correct += (pred == labels).sum().item()
 
     print('======================')
     print('epoch: %d  batch size: %d' % (opt.epochs, opt.batch_size))

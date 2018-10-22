@@ -3,7 +3,7 @@
 import os, sys
 import time
 import argparse
-from utils import load_cifar10, load_cifar100
+from utils import load_cifar10, load_cifar100, show_progress
 
 import numpy as np
 
@@ -35,9 +35,7 @@ class CNN(Chain):
         return self.fc(x)
 
 class Trainer(object):
-
     def __init__(self):
-
         self.net = CNN()
         self.opt = optimizers.Adam()
         self.opt.setup(self.net)
@@ -94,10 +92,10 @@ class Trainer(object):
                 lap_time.append(e_time - s_time)
 
                 if b%10 == 0:
+                    loss = to_cpu(loss.data)
                     acc = F.accuracy(logits, y_batch)
                     acc = to_cpu(acc.data)
-                    print('epoch : {}, batch : {}, accuracy : {}'\
-                          .format(e, b, acc))
+                    show_progress(e+1, b+1, batch_size, loss, acc)
 
             lap_times.append(np.sum(lap_time))
 
@@ -109,7 +107,7 @@ class Trainer(object):
                 preds_val = self.net(x_val)
                 acc_val = F.accuracy(preds_val, y_val)
                 accs_val.append(to_cpu(acc_val.data))
-            print('{} epoch validation accuracy {}'.format(e, np.mean(accs_val)))
+            print('\n{} epoch validation accuracy {}'.format(e+1, np.mean(accs_val)))
 
             # save trained model
             serializers.save_npz('./model_chainer/chainer{}.model'.format(e),

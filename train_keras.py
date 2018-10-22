@@ -14,7 +14,7 @@ from keras.layers.normalization import BatchNormalization
 from keras.layers.convolutional import Conv2D
 from keras.optimizers import Adam
 
-from utils import load_cifar10, load_cifar100
+from utils import load_cifar10, load_cifar100, show_progress
 
 def cnn(image_size = 32, num_output = 10):
 
@@ -78,8 +78,7 @@ class Trainer(object):
                 if b%10 == 0:
                     preds = self.net.predict(x_batch)
                     acc = np.mean(np.sum(preds*y_batch, axis = 1))
-                    print('epoch : {}, batch : {}, accuracy : {}'\
-                          .format(e, b, acc))
+                    show_progress(e+1, b+1, num_batches, loss, acc)
 
             lap_times.append(np.sum(lap_time))
 
@@ -91,7 +90,7 @@ class Trainer(object):
                 preds_val = self.net.predict(x_val)
                 acc_val = np.mean(np.sum(preds_val*y_val, axis = 1))
                 accs_val.append(acc_val)
-            print('{} epoch validation accuracy {}'.format(e, np.mean(accs_val)))
+            print('\n{} epoch validation accuracy {}'.format(e+1, np.mean(accs_val)))
 
             # save trained model
             self.net.save_weights('./model_keras/model_{}.h5'.format(e))

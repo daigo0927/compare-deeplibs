@@ -6,14 +6,9 @@ import tensorflow as tf
 from datasetv2 import Flowers
 from modelv2 import ResNetMini
 
+
 loss_fn = tf.losses.categorical_crossentropy
 acc_fn = tf.metrics.categorical_accuracy
-
-def grad(model, inputs, targets):
-    with tf.GradientTape() as tape:
-        preds = model(inputs, training=True)
-        loss = tf.reduce_mean(loss_fn(targets, preds, from_logits=True))
-    return loss, tape.gradient(loss, model.trainable_variables)
 
 
 def train(args):
@@ -32,14 +27,14 @@ def train(args):
 
     optimizer = tf.keras.optimizers.Adam(lr=args.learning_rate)
 
-    # @tf.function
-    # def train_step(images, labels):
-    #     with tf.GradientTape() as tape:
-    #         y_pred = model(images, training=True)
-    #         loss = tf.reduce_mean(loss_fn(labels, y_pred, from_logits=True))
-    #     grad = tape.gradient(loss, model.trainable_variables)
-    #     optimizer.apply_gradients(zip(grad, model.trainable_variables))
-    #     return loss
+    @tf.function
+    def train_step(images, labels):
+        with tf.GradientTape() as tape:
+            y_pred = model(images, training=True)
+            loss = tf.reduce_mean(loss_fn(labels, y_pred, from_logits=True))
+        grad = tape.gradient(loss, model.trainable_variables)
+        optimizer.apply_gradients(zip(grad, model.trainable_variables))
+        return loss
 
     for e in range(args.epochs):
         for i, (images, labels) in enumerate(dataset.train_loader):

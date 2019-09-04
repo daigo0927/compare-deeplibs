@@ -42,16 +42,17 @@ class ResBlock(layers.Layer):
 
 class ResNetMini(tf.keras.Model):
     def __init__(self,
+                 filters,
                  output_dim,
                  output_type='logit',
                  name='resnet'):
         super(ResNetMini, self).__init__(name=name)
+        self.filters = filters
         self.output_dim = output_dim
         if output_type not in ['logit', 'prob']:
             raise AssertionError('output_type is either logit or prob')
         self.output_type = output_type
 
-        filters = 32
         self.conv = layers.Conv2D(filters, (7, 7), (2, 2), 'same', name='conv')
         self.bn = layers.BatchNormalization(name='bn')
         self.pool = layers.MaxPooling2D((3, 3), (2, 2), 'same', name='pool')

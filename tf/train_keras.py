@@ -18,7 +18,8 @@ def train(args):
                       flip_left_right=args.flip_left_right,
                       flip_up_down=args.flip_up_down)
 
-    model = ResNetMini(output_dim=dataset.num_classes,
+    model = ResNetMini(filters=args.filters,
+                       output_dim=dataset.num_classes,
                        output_type='prob',
                        name='resnet')
 

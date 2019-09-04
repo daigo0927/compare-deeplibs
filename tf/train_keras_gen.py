@@ -30,7 +30,8 @@ def train(args):
         subset='validation'
     )
 
-    model = ResNetMini(output_dim=train_generator.num_classes,
+    model = ResNetMini(filters=args.filters,
+                       output_dim=train_generator.num_classes,
                        output_type='prob',
                        name='resnet')
 

@@ -23,7 +23,9 @@ def train(args):
                       flip_left_right=args.flip_left_right,
                       flip_up_down=args.flip_up_down)
 
-    model = ResNetMini(output_dim=dataset.num_classes, name='resnet')
+    model = ResNetMini(filters=args.filters,
+                       output_dim=dataset.num_classes,
+                       name='resnet')
 
     optimizer = tf.keras.optimizers.Adam(lr=args.learning_rate)
 

@@ -34,8 +34,8 @@ def prepare_parser():
     parser.add_argument('-v', '--validation_split', type=float, default=0.1,
                         help='Validtion split ratio [0.1]')
     # Data pipeline configs
-    parser.add_argument('--resize_shape', nargs=2, type=int, default=[64, 64],
-                        help='Resize shape [64, 64]')
+    parser.add_argument('--resize_shape', nargs=2, type=int, default=[32, 32],
+                        help='Resize shape [32, 32]')
     parser.add_argument('--crop_shape', nargs=2, type=int, default=None,
                         help='Crop shape for images. [None]')
     parser.add_argument('--rotate', action='store_true',

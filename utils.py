@@ -44,6 +44,9 @@ def prepare_parser():
                         help='Enable left-right flip in preprocessing')
     parser.add_argument('-flip-ud', '--flip_up_down', action='store_true',
                         help='Enable up-down flip in preprocessing')
+    # Model config
+    parser.add_argument('--filters', type=int, default=64,
+                        help='Base filter number [64]')
     # Learning configs
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.001,
                         help='Learning rate [0.001]')

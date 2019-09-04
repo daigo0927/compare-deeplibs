@@ -234,3 +234,66 @@ class Flowers(Base):
             self.samples = (imagefiles, labels)
         else:
             raise ValueError('Flower dataset does not have test-set')
+
+
+class Cifar10(Base):
+    """ tf.data pipeline for cifar-10 dataset
+    https://www.cs.toronto.edu/~kriz/cifar.html
+    """
+    def __init__(self,
+                 dataset_dir,
+                 train_or_test,
+                 batch_size=1,
+                 one_hot=True,
+                 validation_split=0.1,
+                 resize_shape=None,
+                 crop_shape=None,
+                 rotate=False,
+                 flip_left_right=False,
+                 flip_up_down=False):
+        """
+        Args:
+          - dataset_dir: string of /path/to/dataset-directory
+          - train_or_test: train or test argument
+          - batch_size: int for batch size
+          - one_hot: boolean for one-hot encoding
+          - validation_split: validation split ratio, should be in [0, 1]
+          - resize_shape: tuple for resize shape (optional)
+          - crop_shape: tuple for crop shape (optional)
+          - rotate: boolean for rotation (optional)
+          - flip_left_right: boolean for horizontal flip (optional)
+          - flip_up_down: boolean for vertical flip (optional)
+        """
+        super().__init__(dataset_dir=dataset_dir,
+                         train_or_test=train_or_test,
+                         batch_size=batch_size,
+                         one_hot=one_hot,
+                         validation_split=validation_split,
+                         resize_shape=resize_shape,
+                         crop_shape=crop_shape,
+                         rotate=rotate,
+                         flip_left_right=flip_left_right,
+                         flip_up_down=flip_up_down)
+
+    def _set_classes(self):
+        self.classes = ['airplane',
+			'automobile',
+			'bird',
+			'cat',
+			'deer',
+			'dog',
+			'frog',
+			'horse',
+			'ship',
+			'truck']
+
+    def _get_filenames(self):
+        subd = self.dataset_dir + '/' + self.train_or_test
+        imagefiles, labels = [], []
+        for c in range(self.num_classes):
+            filepath = '/'.join([subd, str(c), '*.png'])
+            ifiles = glob(filepath)
+            imagefiles += ifiles
+            labels += [c]*len(ifiles)
+        self.samples = (imagefiles, labels)
+

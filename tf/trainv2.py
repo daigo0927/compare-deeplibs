@@ -3,7 +3,7 @@ sys.path.append(os.pardir)
 import utils
 import numpy as np
 import tensorflow as tf
-from datasetv2 import Flowers
+from datasetv2 import Cifar10
 from modelv2 import ResNetMini
 
 
@@ -12,7 +12,7 @@ acc_fn = tf.metrics.categorical_accuracy
 
 
 def train(args):
-    dataset = Flowers(dataset_dir=args.dataset_dir,
+    dataset = Cifar10(dataset_dir=args.dataset_dir,
                       train_or_test='train',
                       batch_size=args.batch_size,
                       one_hot=True,
@@ -38,9 +38,7 @@ def train(args):
 
     for e in range(args.epochs):
         for i, (images, labels) in enumerate(dataset.train_loader):
-            # loss = train_step(images, labels)
-            loss, grads = grad(model, images, labels)
-            optimizer.apply_gradients(zip(grads, model.trainable_variables))
+            loss = train_step(images, labels)
 
             if i%10 == 0:
                 utils.show_progress(e+1, i+1, len(dataset)//args.batch_size,
@@ -52,10 +50,10 @@ def train(args):
         loss = tf.reduce_mean(loss_fn(labels, preds))
         acc = tf.reduce_mean(acc_fn(labels, preds))
         losses.append(loss.numpy())
-        accs.append(acc.numpy)
+        accs.append(acc.numpy())
     print(f'Validation score: loss: {np.mean(losses)}, accuracy: {np.mean(accs)}')
 
-    model.save_weights('./modelv2.ckpt')
+    # model.save_weights('./modelv2.ckpt')
 
 
 if __name__ == '__main__':

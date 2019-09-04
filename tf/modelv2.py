@@ -43,9 +43,13 @@ class ResBlock(layers.Layer):
 class ResNetMini(tf.keras.Model):
     def __init__(self,
                  output_dim,
+                 output_type='logit',
                  name='resnet'):
         super(ResNetMini, self).__init__(name=name)
         self.output_dim = output_dim
+        if output_type not in ['logit', 'prob']:
+            raise AssertionError('output_type is either logit or prob')
+        self.output_type = output_type
 
         filters = 32
         self.conv = layers.Conv2D(filters, (7, 7), (2, 2), 'same', name='conv')
@@ -71,4 +75,7 @@ class ResNetMini(tf.keras.Model):
 
         h = tf.reduce_mean(h, axis=(1, 2))
         logits = self.fc(h)
-        return logits
+        if self.output_type == 'logit':
+            return logits
+        else:
+            return tf.nn.softmax(logits, axis=-1)

@@ -1,5 +1,6 @@
 import os, sys
 sys.path.append(os.pardir)
+import time
 import numpy as np
 import tensorflow as tf
 from datasetv2 import Cifar10
@@ -45,17 +46,20 @@ def train(args):
     n_batches = np.ceil(len(dataset)*(1-args.validation_split)/args.batch_size)
     for e in range(args.epochs):
         for i, (images, labels) in enumerate(dataset.train_loader):
+            start = time.time()
             loss, acc = train_step(images, labels)
+            step_time = time.time() - start
             # ----- Output log -----
             if i%10 == 0:
-                show_progress(e+1, i+1, n_batches,
-                              loss=loss.numpy(), accuracy=acc.numpy())
+                show_progress(e+1, i+1, int(n_batches),
+                              loss=loss.numpy(), accuracy=acc.numpy(),
+                              step_time=step_time)
 
         # -------------- Validation ---------------
         losses, accs = [], []
         for images, labels in dataset.val_loader:
             preds = model(images, training=False)
-            loss = tf.reduce_mean(loss_fn(labels, preds))
+            loss = tf.reduce_mean(loss_fn(labels, preds, from_logits=True))
             acc = tf.reduce_mean(acc_fn(labels, preds))
             losses.append(loss.numpy())
             accs.append(acc.numpy())

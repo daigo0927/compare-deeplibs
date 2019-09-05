@@ -66,7 +66,7 @@ class ResNetMini(tf.keras.Model):
 
     def call(self, x, training):
         h = self.conv(x)
-        h = tf.nn.relu(self.bn(h, training=training))
+        h = self.bn(h, training=training)
         h = self.pool(h)
 
         h = self.block0_0(h, training=training)

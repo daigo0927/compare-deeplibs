@@ -44,7 +44,8 @@ def train(args):
 
     # ------------- Build model and optimizer-----------------
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model = ResNetMini(64, dataset.num_classes).to(device)
+    model = ResNetMini(args.filters,
+                       dataset.num_classes).to(device)
     criterion = nn.CrossEntropyLoss().to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 

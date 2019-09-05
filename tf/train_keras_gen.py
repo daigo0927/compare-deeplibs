@@ -1,9 +1,9 @@
 import os, sys
 sys.path.append(os.pardir)
-import utils
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import DirectoryIterator, ImageDataGenerator
 from model_keras import ResNetMini
+from utils import prepare_parser
 
 
 def train(args):
@@ -48,7 +48,7 @@ def train(args):
 
 
 if __name__ == '__main__':
-    parser = utils.prepare_parser()
+    parser = prepare_parser()
     args = parser.parse_args()
     for k, v in vars(args).items():
         print(f'{k}: {v}')

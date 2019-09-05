@@ -50,8 +50,9 @@ def train(args):
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 
     # ------------- Training loop -----------------
-    losses, accs, times = [], [], []
     for e in range(args.epochs):
+        model.train()
+        tset.dataset.train()
         for i, (images, labels) in enumerate(tloader):
             images, labels = images.to(device, torch.float32), labels.to(device)
             model.zero_grad()
@@ -64,18 +65,19 @@ def train(args):
                 acc = accuracy(logits, labels)
                 show_progress(e+1, i+1, len(tloader), loss=loss.item(), accuracy=acc)
 
-    # ------------- Evaludation -----------------
-    model.eval()
-    vset.dataset.eval()
-    losses, accs = [], []
-    for images, labels in vloader:
-        logits = model(images.float())
-        loss = criterion(logits, labels)
-        acc = accuracy(logits, labels)
-        losses.append(loss.item())
-        accs.append(acc)
-    print('Validation score: loss: {}, accuracy: {}.'\
-          .format(np.mean(losses), np.mean(acc)))
+        # ------------- Evaluation -----------------
+        model.eval()
+        vset.dataset.eval()
+        losses, accs = [], []
+        for images, labels in vloader:
+            images, labels = images.to(device, torch.float32), labels.to(device)
+            logits = model(images)
+            loss = criterion(logits, labels)
+            acc = accuracy(logits, labels)
+            losses.append(loss.item())
+            accs.append(acc)
+            print('Validation score: loss: {}, accuracy: {}.'\
+                  .format(np.mean(losses), np.mean(acc)))
 
 
 if __name__ == '__main__':

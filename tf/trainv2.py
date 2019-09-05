@@ -1,10 +1,10 @@
 import os, sys
 sys.path.append(os.pardir)
-import utils
 import numpy as np
 import tensorflow as tf
 from datasetv2 import Cifar10
 from modelv2 import ResNetMini
+from utils import show_progress, prepare_parser
 
 
 loss_fn = tf.losses.categorical_crossentropy
@@ -29,37 +29,42 @@ def train(args):
 
     optimizer = tf.keras.optimizers.Adam(lr=args.learning_rate)
 
+    # Define parameter update operation as a static graph
+    # This can speed up the execution
     @tf.function
     def train_step(images, labels):
         with tf.GradientTape() as tape:
-            y_pred = model(images, training=True)
-            loss = tf.reduce_mean(loss_fn(labels, y_pred, from_logits=True))
+            logits = model(images, training=True)
+            loss = tf.reduce_mean(loss_fn(labels, logits, from_logits=True))
+            acc = tf.reduce_mean(acc_fn(labels, logits))
         grad = tape.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(zip(grad, model.trainable_variables))
-        return loss
+        return loss, acc
 
+    # ---------------- Actual training loop -------------------
+    n_batches = np.ceil(len(dataset)*(1-args.validation_split)/args.batch_size)
     for e in range(args.epochs):
         for i, (images, labels) in enumerate(dataset.train_loader):
-            loss = train_step(images, labels)
-
+            loss, acc = train_step(images, labels)
+            # ----- Output log -----
             if i%10 == 0:
-                utils.show_progress(e+1, i+1, len(dataset)//args.batch_size,
-                                    loss=loss.numpy())
+                show_progress(e+1, i+1, n_batches,
+                              loss=loss.numpy(), accuracy=acc.numpy())
 
-    losses, accs = [], []
-    for images, labels in dataset.val_loader:
-        preds = model(images, training=False)
-        loss = tf.reduce_mean(loss_fn(labels, preds))
-        acc = tf.reduce_mean(acc_fn(labels, preds))
-        losses.append(loss.numpy())
-        accs.append(acc.numpy())
-    print(f'Validation score: loss: {np.mean(losses)}, accuracy: {np.mean(accs)}')
-
-    # model.save_weights('./modelv2.ckpt')
+        # -------------- Validation ---------------
+        losses, accs = [], []
+        for images, labels in dataset.val_loader:
+            preds = model(images, training=False)
+            loss = tf.reduce_mean(loss_fn(labels, preds))
+            acc = tf.reduce_mean(acc_fn(labels, preds))
+            losses.append(loss.numpy())
+            accs.append(acc.numpy())
+        print('\nValidation score: loss: {}, accuracy: {}'\
+              .format(np.mean(losses), np.mean(accs)))
 
 
 if __name__ == '__main__':
-    parser = utils.prepare_parser()
+    parser = prepare_parser()
     args = parser.parse_args()
     for k, v in vars(args).items():
         print(f'{k}: {v}')

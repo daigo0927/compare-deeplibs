@@ -1,5 +1,6 @@
 import os, sys
 sys.path.append(os.pardir)
+import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -54,16 +55,20 @@ def train(args):
         model.train()
         tset.dataset.train()
         for i, (images, labels) in enumerate(tloader):
+            start = time.time()
             images, labels = images.to(device, torch.float32), labels.to(device)
             model.zero_grad()
             logits = model(images)
             loss = criterion(logits, labels)
             loss.backward()
             optimizer.step()
+            step_time = time.time() - start
 
             if i%10 == 0:
                 acc = accuracy(logits, labels)
-                show_progress(e+1, i+1, len(tloader), loss=loss.item(), accuracy=acc)
+                show_progress(e+1, i+1, len(tloader),
+                              loss=loss.item(), accuracy=acc,
+                              step_time=step_time)
 
         # ------------- Evaluation -----------------
         model.eval()
@@ -76,8 +81,8 @@ def train(args):
             acc = accuracy(logits, labels)
             losses.append(loss.item())
             accs.append(acc)
-            print('Validation score: loss: {}, accuracy: {}.'\
-                  .format(np.mean(losses), np.mean(acc)))
+        print('Validation score: loss: {}, accuracy: {}.'\
+              .format(np.mean(losses), np.mean(accs)))
 
 
 if __name__ == '__main__':

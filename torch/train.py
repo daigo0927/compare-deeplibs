@@ -81,7 +81,7 @@ def train(args):
             acc = accuracy(logits, labels)
             losses.append(loss.item())
             accs.append(acc)
-        print('Validation score: loss: {}, accuracy: {}.'\
+        print('\nValidation score: loss: {}, accuracy: {}.'\
               .format(np.mean(losses), np.mean(accs)))
 
 

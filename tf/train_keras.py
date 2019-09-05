@@ -1,7 +1,7 @@
 import os, sys
 sys.path.append(os.pardir)
 import tensorflow as tf
-from datasetv2 import Cifar10
+from dataset_tf import Cifar10
 from model_keras import ResNetMini
 from utils import prepare_parser
 

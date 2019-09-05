@@ -1,1 +1,1 @@
-from modelv2 import ResNetMini
+from model_tf import ResNetMini

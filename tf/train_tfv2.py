@@ -3,8 +3,8 @@ sys.path.append(os.pardir)
 import time
 import numpy as np
 import tensorflow as tf
-from datasetv2 import Cifar10
-from modelv2 import ResNetMini
+from dataset_tf import Cifar10
+from model_tf import ResNetMini
 from utils import show_progress, prepare_parser
 
 

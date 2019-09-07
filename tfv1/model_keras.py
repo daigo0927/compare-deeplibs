@@ -64,9 +64,6 @@ class ResNetMini(tf.keras.Model):
 
         self.fc = layers.Dense(output_dim, name='fc')
 
-    def build(self, input_shape):
-        super().build(input_shape)
-
     def call(self, x, training):
         h = self.conv(x)
         h = self.bn(h, training=training)

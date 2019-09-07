@@ -31,7 +31,7 @@ def train(args):
         subset='validation'
     )
 
-    inputs = Input(shape=(*args.resize_shape, 3))
+    inputs = Input(shape=train_generator.image_shape)
     net = ResNetMini(filters=args.filters,
                      output_dim=train_generator.num_classes,
                      output_type='prob',
@@ -47,9 +47,10 @@ def train(args):
     callbacks = None
     model.fit_generator(train_generator,
                         epochs=args.epochs,
-                        callbacks=callbacks)
-                        # validation_data=val_generator)
-    # validation_data raises NoneType error in keras of tf-v1 API
+                        callbacks=callbacks,
+                        validation_data=val_generator)
+    # .fit_generator raises NoneType error when the iteration finished
+    # in keras of tf-v1 API
 
 
 if __name__ == '__main__':

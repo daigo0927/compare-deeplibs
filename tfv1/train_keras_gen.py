@@ -2,7 +2,7 @@ import os, sys
 sys.path.append(os.pardir)
 import tensorflow as tf
 from tensorflow.keras import Input, Model
-from tensorflow.keras.preprocessing.image import DirectoryIterator, ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from model_keras import ResNetMini
 from utils import prepare_parser
 

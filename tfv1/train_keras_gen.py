@@ -1,9 +1,8 @@
 import os, sys
 sys.path.append(os.pardir)
 import tensorflow as tf
-from tensorflow.keras import Input, Model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from model_keras import ResNetMini
+from model_keras import build_resnet
 from utils import prepare_parser
 
 
@@ -31,13 +30,10 @@ def train(args):
         subset='validation'
     )
 
-    inputs = Input(shape=train_generator.image_shape)
-    net = ResNetMini(filters=args.filters,
-                     output_dim=train_generator.num_classes,
-                     output_type='prob',
-                     name='resnet')
-    outputs = net(inputs, training=True)
-    model = Model(inputs=inputs, outputs=outputs)
+    model = build_resnet(input_shape=train_generator.image_shape,
+                         filters=args.filters,
+                         output_dim=train_generator.num_classes,
+                         output_type='prob')
 
     optimizer = tf.keras.optimizers.Adam(lr=args.learning_rate)
     loss = tf.keras.losses.categorical_crossentropy

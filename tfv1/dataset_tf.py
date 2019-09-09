@@ -107,13 +107,13 @@ class Base(metaclass=ABCMeta):
               .map(self.transform)\
               .prefetch(self.batch_size)\
               .batch(self.batch_size)\
-              .make_one_shot_iterator()
+              .make_initializable_iterator()
             self.val_iterator = dataset.skip(idx)\
               .map(self.read)\
               .map(self.preprocess)\
               .prefetch(self.batch_size)\
               .batch(self.batch_size)\
-              .make_one_shot_iterator()
+              .make_initializable_iterator()
         else:
             self.test_iterator = tf.data.Dataset.from_tensor_slices(self.samples)\
               .map(self.read)\

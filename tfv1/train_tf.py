@@ -35,12 +35,14 @@ def train(args):
                        output_dim=dataset.num_classes,
                        name='resnet')
     # Training graph
+    initialize_train = dataset.train_iterator.initializer
     images, labels = dataset.train_iterator.get_next()
     logits = model(images, training=True)
     loss = loss_fn(labels, logits)
     acc = acc_fn(labels, logits)
 
     # Validation graph
+    initialize_val = dataset.val_iterator.initializer
     images_val, labels_val = dataset.val_iterator.get_next()
     logits_val = model(images_val, training=False)
     loss_val = loss_fn(labels_val, logits_val)
@@ -59,19 +61,20 @@ def train(args):
     n_batches = int(len(dataset)*(1-args.validation_split)/args.batch_size)
     n_batches_val = int(len(dataset)*args.validation_split/args.batch_size)
     for e in range(args.epochs):
+        sess.run(initialize_train)
         for i in range(n_batches):
             start = time.time()
-            sess.run([update_weights, update_bn])
+            _, _, loss_, acc_ = sess.run([update_weights, update_bn, loss, acc])
             step_time = time.time() - start
             # ----- Output log -----
-            if i%10 == 0:
-                loss_, acc_ = sess.run([loss, acc])
+            if i%10 == 0 or i+1 == n_batches:
                 show_progress(e+1, i+1, int(n_batches),
                               loss=loss_, accuracy=acc_,
                               step_time=step_time)
 
         # -------------- Validation ---------------
         losses, accs = [], []
+        sess.run(initialize_val)
         for _ in range(n_batches_val):
             loss_, acc_ = sess.run([loss_val, acc_val])
             losses.append(loss_)

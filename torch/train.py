@@ -19,10 +19,17 @@ def accuracy(logits, labels):
 
 
 def train(args):
-    # ------------- Build dataset pipeline -----------------
-    dataset = Cifar10(dataset_dir=args.dataset_dir,
-                      train_or_test='train',
-                      resize_shape=args.resize_shape)
+    # Create preprocesses
+    preps = []
+    if args.resize_shape:
+        preps.append(transforms.Resize(args.resize_shape))
+    preps += [
+        lambda x: np.asarray(x),
+        lambda x: x/255.0,
+        transforms.ToTensor()
+    ]
+    preprocess = transforms.Compose(preps)
+    
     # Create augumentations
     trans = []
     if args.crop_shape:
@@ -34,7 +41,12 @@ def train(args):
     if args.flip_up_down:
         trans.append(transforms.RandomFlipUpDown())
     transform = transforms.Compose(trans)
-    dataset.set_transform(transform)
+
+    # ------------- Build dataset pipeline -----------------
+    dataset = Cifar10(dataset_dir=args.dataset_dir,
+                      train_or_test='train',
+                      preprocess=preprocess,
+                      transform=transform)
 
     # Build dataloader
     n_train = int(len(dataset)*(1-args.validation_split))

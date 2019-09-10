@@ -14,25 +14,26 @@ class Base(Dataset, metaclass=ABCMeta):
     def __init__(self,
                  dataset_dir,
                  train_or_test,
-                 resize_shape=None):
+                 preprocess=None,
+                 transform=None):
         """
         Args:
           - dataset_dir: string of /path/to/dataset-directory
           - train_or_test: train or test argument
-          - resize_shape: tuple for resize shape (optional)
+          - preprocess: preprocess applied to ALL data
+          - transform: data augmentation applied to TRAINING data
          """
         self.dataset_dir = dataset_dir
         self.train_or_test = train_or_test
         self.training = True
 
-        self.resize_shape = resize_shape
-        self.transform = None
+        self.preprocess = preprocess
+        self.transform = transform
 
         print('Building a dataset pipeline ...')
         self._set_classes()
         self._get_filenames()
         print('Found {} images.'.format(len(self)))
-        self._build_preprocess()
         print('Done.')
 
     def __len__(self):
@@ -41,8 +42,9 @@ class Base(Dataset, metaclass=ABCMeta):
     def __getitem__(self, idx):
         imagefile, label = self.samples[idx]
         image, label = self._read(imagefile, label)
-        image = self.preprocess(image)
         label = torch.as_tensor(label, dtype=torch.long)
+        if self.preprocess:
+            image = self.preprocess(image)
         if self.training and self.transform:
             image = self.transform(image)
         return image, label
@@ -52,25 +54,11 @@ class Base(Dataset, metaclass=ABCMeta):
         label = int(label)
         return image, label
 
-    def _build_preprocess(self):
-        """ Implement preprocess (should be execute both train/val/test set) """
-        preps = []
-        if self.resize_shape is not None:
-            preps.append(transforms.Resize(self.resize_shape))
-        preps += [
-            lambda x: np.asarray(x),
-            lambda x: x/255.0,
-            transforms.ToTensor()
-        ]
-        self.preprocess = transforms.Compose(preps)
-
-    def set_transform(self, transform):
-        """ Set input transformation by torchvision.transforms """
-        self.transform = transform
-
+    @abstractmethod
     def _set_classes(self):
         """ implement self.classes """; ...
 
+    @abstractmethod
     def _get_filenames(self):
         """ implement self.samples """; ...
 
@@ -94,16 +82,19 @@ class Cifar10(Base):
     def __init__(self,
                  dataset_dir,
                  train_or_test,
-                 resize_shape=None):
+                 preprocess=None,
+                 transform=None):
         """
         Args:
           - dataset_dir: string of /path/to/dataset-directory
           - train_or_test: train or test argument
-           - resize_shape: tuple for resize shape (optional)
+          - preprocess: preprocess applied to ALL data
+          - transform: data augmentation applied to TRAINING data
         """
         super().__init__(dataset_dir=dataset_dir,
                          train_or_test=train_or_test,
-                         resize_shape=resize_shape)
+                         preprocess=preprocess,
+                         transform=transform)
 
     def _set_classes(self):
         self.classes = ['airplane',

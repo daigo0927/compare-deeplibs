@@ -1,13 +1,11 @@
 import numpy as np
-import torch
-from torch.utils.data import Dataset
-from torchvision import transforms
+from chainer import dataset
 from PIL import Image
 from glob import glob
 from abc import abstractmethod, ABCMeta
 
 
-class Base(Dataset, metaclass=ABCMeta):
+class Base(dataset.DatasetMixin, metaclass=ABCMeta):
     """
     Abstract class to flexibly implement dataset pipeline
     """
@@ -38,11 +36,10 @@ class Base(Dataset, metaclass=ABCMeta):
     def __len__(self):
         return len(self.samples)
 
-    def __getitem__(self, idx):
+    def get_example(self, idx):
         imagefile, label = self.samples[idx]
         image, label = self._read(imagefile, label)
         image = self.preprocess(image)
-        label = torch.as_tensor(label, dtype=torch.long)
         if self.training and self.transform:
             image = self.transform(image)
         return image, label
@@ -65,7 +62,7 @@ class Base(Dataset, metaclass=ABCMeta):
         self.preprocess = transforms.Compose(preps)
 
     def set_transform(self, transform):
-        """ Set input transformation by torchvision.transforms """
+        """ Inplement input transformation """
         self.transform = transform
 
     def _set_classes(self):
@@ -88,7 +85,7 @@ class Base(Dataset, metaclass=ABCMeta):
 
 
 class Cifar10(Base):
-    """ torch dataset pipeline for cifar-10 dataset
+    """ Chainer dataset pipeline for cifar-10 dataset
     https://www.cs.toronto.edu/~kriz/cifar.html
     """
     def __init__(self,

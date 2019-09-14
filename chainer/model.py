@@ -59,7 +59,7 @@ class ResNetMini(chainer.Chain):
                 ResBlock(filters*2, filters*2),
                 partial(F.average, axis=(2, 3))
                 )
-            self.fc = F.Linear(filters*2, output_dim)
+            self.fc = L.Linear(filters*2, output_dim)
 
     def forward(self, x):
         x = self.features(x)

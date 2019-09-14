@@ -71,6 +71,7 @@ class Base(dataset.DatasetMixin, metaclass=ABCMeta):
         self.training = True
 
 
+
 class Preprocess:
     def __init__(self, resize_shape):
         self.resize_shape = resize_shape

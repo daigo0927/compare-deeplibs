@@ -30,6 +30,7 @@ def train(args):
     tset, vset = split_dataset_random(dataset, n_train)
     titer = iterators.SerialIterator(tset, args.batch_size)
     viter = iterators.SerialIterator(vset, args.batch_size)
+
     
     device = chainer.get_device(args.device)
 
@@ -76,7 +77,7 @@ def train(args):
             accs.append(to_cpu(acc.array))
         print('\nValidation score: loss: {}, accuracy: {}.'\
               .format(np.mean(losses), np.mean(accs)))
-        
+
 
 if __name__ == '__main__':
     parser = prepare_parser()

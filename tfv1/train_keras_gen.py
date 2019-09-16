@@ -50,6 +50,7 @@ def train(args):
     # .fit_generator raises NoneType error when the iteration finished
     # in keras of tf-v1 API
     loop_time = time.time() - start_loop
+    print('Total time: {}sec.'.format(loop_time))
     
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 import os, sys
 sys.path.append(os.pardir)
+import time
 import tensorflow as tf
 from dataset_tf import Cifar10
 from model_keras import ResNetMini
@@ -29,11 +30,14 @@ def train(args):
     model.compile(optimizer, loss, [accuracy])
 
     callbacks = None
+    start_loop = time.time()
     model.fit_generator(dataset.train_loader,
                         epochs=args.epochs,
                         callbacks=callbacks,
                         validation_data=dataset.val_loader)
-
+    loop_time = time.time() - start_loop
+    print('Total time: {}sec.'.format(loop_time))
+    
 
 if __name__ == '__main__':
     parser = prepare_parser()

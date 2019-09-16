@@ -30,7 +30,6 @@ def train(args):
     tset, vset = split_dataset_random(dataset, n_train)
     titer = iterators.SerialIterator(tset, args.batch_size)
     viter = iterators.SerialIterator(vset, args.batch_size)
-
     
     device = chainer.get_device(args.device)
 
@@ -40,28 +39,30 @@ def train(args):
     optimizer.setup(model)
 
     # ------------- Actual training step-----------------
+    start_loop = time.time()
     n_batches = np.ceil(len(tset)/args.batch_size)
     for e in range(args.epochs):
+        start_epoch = time.time()
         # ------------- Training --------------------
         dataset.train()
         i = 0
         while titer.epoch == e:
             batch = titer.next()
             images, labels = concat_examples(batch, device)
-            start = time.time() # <<< Start time measurement ---
+            start_batch = time.time() # <<< Start time measurement ---
             logits = model(images)
             loss = F.softmax_cross_entropy(logits, labels)
             model.cleargrads()
             loss.backward()
             optimizer.update()
-            step_time = time.time() - start # --- Stop time measurement >>>
+            batch_time = time.time() - start_batch # --- Stop time measurement >>>
 
             if i%10 == 0: # --- Output logs -----
                 acc = F.accuracy(logits, labels)
                 show_progress(e+1, i+1, int(n_batches),
                               loss=to_cpu(loss.array),
                               accuracy=to_cpu(acc.array),
-                              step_time=step_time)
+                              batch_time=batch_time)
             i += 1
 
         # ------------- Validation --------------------
@@ -75,8 +76,13 @@ def train(args):
             acc = F.accuracy(logits, labels)
             losses.append(to_cpu(loss.array))
             accs.append(to_cpu(acc.array))
-        print('\nValidation score: loss: {}, accuracy: {}.'\
-              .format(np.mean(losses), np.mean(accs)))
+
+        epoch_time = time.time() - start_epoch
+        print('\nValidation score: loss: {}, accuracy: {}, epoch time: {}.'\
+              .format(np.mean(losses), np.mean(accs), epoch_time))
+
+    loop_time = time.time() - start_loop
+    print('Total time: {}sec.'.format(loop_time))
 
 
 if __name__ == '__main__':

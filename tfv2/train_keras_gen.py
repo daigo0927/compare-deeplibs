@@ -1,5 +1,6 @@
 import os, sys
 sys.path.append(os.pardir)
+import time
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import DirectoryIterator, ImageDataGenerator
 from model_keras import ResNetMini
@@ -41,10 +42,13 @@ def train(args):
     model.compile(optimizer, loss, [accuracy])
 
     callbacks = None
+    start_loop = time.time()
     model.fit_generator(train_generator,
                         epochs=args.epochs,
                         callbacks=callbacks,
                         validation_data=val_generator)
+    loop_time = time.time() - start_loop
+    print('Total time: {}sec.'.format(loop_time))
 
 
 if __name__ == '__main__':

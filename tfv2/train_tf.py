@@ -42,29 +42,42 @@ def train(args):
         optimizer.apply_gradients(zip(grad, model.trainable_variables))
         return loss, acc
 
+    @tf.function
+    def val_step(images, labels):
+        logits = model(images, training=False)
+        loss = tf.reduce_mean(loss_fn(labels, logits, from_logits=True))
+        acc = tf.reduce_mean(acc_fn(labels, logits))
+        return loss, acc
+
     # ---------------- Actual training loop -------------------
+    start_loop = time.time()
     n_batches = np.ceil(len(dataset)*(1-args.validation_split)/args.batch_size)
     for e in range(args.epochs):
+        start_epoch = time.time()
+        
         for i, (images, labels) in enumerate(dataset.train_loader):
-            start = time.time()
+            start_batch = time.time()
             loss, acc = train_step(images, labels)
-            step_time = time.time() - start
+            batch_time = time.time() - start_batch
             # ----- Output log -----
             if i%10 == 0:
                 show_progress(e+1, i+1, int(n_batches),
                               loss=loss.numpy(), accuracy=acc.numpy(),
-                              step_time=step_time)
+                              batch_time=batch_time)
 
         # -------------- Validation ---------------
         losses, accs = [], []
         for images, labels in dataset.val_loader:
-            preds = model(images, training=False)
-            loss = tf.reduce_mean(loss_fn(labels, preds, from_logits=True))
-            acc = tf.reduce_mean(acc_fn(labels, preds))
+            loss, acc = val_step(images, labels)
             losses.append(loss.numpy())
             accs.append(acc.numpy())
-        print('\nValidation score: loss: {}, accuracy: {}'\
-              .format(np.mean(losses), np.mean(accs)))
+
+        epoch_time = time.time() - start_epoch
+        print('\nValidation score: loss: {}, accuracy: {}, epoch time: {}.'\
+              .format(np.mean(losses), np.mean(accs), epoch_time))
+
+    loop_time = time.time() - start_loop
+    print('Total time: {}sec.'.format(loop_time))
 
 
 if __name__ == '__main__':

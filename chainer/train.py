@@ -57,7 +57,7 @@ def train(args):
             optimizer.update()
             batch_time = time.time() - start_batch # --- Stop time measurement >>>
 
-            if i%10 == 0 or i+1 == n_batches: # --- Output logs -----
+            if i%args.check_step == 0 or i+1 == n_batches: # --- Output logs -----
                 acc = F.accuracy(logits, labels)
                 show_progress(e+1, i+1, int(n_batches),
                               loss=to_cpu(loss.array),

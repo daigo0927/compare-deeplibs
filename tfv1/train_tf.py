@@ -70,7 +70,7 @@ def train(args):
             _, _, loss_, acc_ = sess.run([update_weights, update_bn, loss, acc])
             batch_time = time.time() - start_batch
             # ----- Output log -----
-            if i%10 == 0 or i+1 == n_batches:
+            if i%args.check_step == 0 or i+1 == n_batches:
                 show_progress(e+1, i+1, int(n_batches),
                               loss=loss_, accuracy=acc_,
                               batch_time=batch_time)

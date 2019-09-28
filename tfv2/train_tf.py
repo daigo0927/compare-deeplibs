@@ -60,7 +60,7 @@ def train(args):
             loss, acc = train_step(images, labels)
             batch_time = time.time() - start_batch
             
-            if i%10 == 0 or i+1 == n_batches: # ----- Output log -----
+            if i%args.check_step == 0 or i+1 == n_batches: # ----- Output log -----
                 show_progress(e+1, i+1, int(n_batches),
                               loss=loss.numpy(), accuracy=acc.numpy(),
                               batch_time=batch_time)

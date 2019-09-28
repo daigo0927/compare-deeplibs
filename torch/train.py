@@ -79,7 +79,7 @@ def train(args):
             optimizer.step()
             batch_time = time.time() - start_batch
 
-            if i%10 == 0 or i+1 == len(tloader): # ----- Output log -----
+            if i%args.check_step == 0 or i+1 == len(tloader): # ----- Output log -----
                 acc = accuracy(logits, labels)
                 show_progress(e+1, i+1, len(tloader),
                               loss=loss.item(), accuracy=acc,

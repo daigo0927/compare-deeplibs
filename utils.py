@@ -29,8 +29,8 @@ def prepare_parser():
     # Iteration config
     parser.add_argument('-e', '--epochs', type=int, default=100,
                         help='Number of epochs [100]')
-    parser.add_argument('-b', '--batch_size', type=int, default=64,
-                        help='Batch size [64]')
+    parser.add_argument('-b', '--batch_size', type=int, default=100,
+                        help='Batch size [100]')
     parser.add_argument('-v', '--validation_split', type=float, default=0.1,
                         help='Validtion split ratio [0.1]')
     parser.add_argument('-cs', '--check_step', type=int, default=100,

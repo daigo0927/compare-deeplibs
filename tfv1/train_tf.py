@@ -58,19 +58,25 @@ def train(args):
     sess.run(tf.global_variables_initializer())
 
     # ---------------- Actual training loop -------------------
+    start_loop = time.time()
     n_batches = int(len(dataset)*(1-args.validation_split)/args.batch_size)
     n_batches_val = int(len(dataset)*args.validation_split/args.batch_size)
     for e in range(args.epochs):
+        start_epoch = time.time()
+        
         sess.run(initialize_train)
         for i in range(n_batches):
-            start = time.time()
+            start_batch = time.time()
             _, _, loss_, acc_ = sess.run([update_weights, update_bn, loss, acc])
-            step_time = time.time() - start
+            batch_time = time.time() - start_batch
             # ----- Output log -----
             if i%10 == 0 or i+1 == n_batches:
                 show_progress(e+1, i+1, int(n_batches),
                               loss=loss_, accuracy=acc_,
-                              step_time=step_time)
+                              batch_time=batch_time)
+
+        train_time = time.time() - start_epoch
+        print('\nTraining time: {}.'.format(train_time))
 
         # -------------- Validation ---------------
         losses, accs = [], []
@@ -79,8 +85,17 @@ def train(args):
             loss_, acc_ = sess.run([loss_val, acc_val])
             losses.append(loss_)
             accs.append(acc_)
-        print('\nValidation score: loss: {}, accuracy: {}'\
-              .format(np.mean(losses), np.mean(accs)))
+
+        val_time = time.time() - start_epoch - train_time
+        print('Validation score: loss: {}, accuracy: {}, time: {}'\
+              .format(np.mean(losses), np.mean(accs), val_time))
+
+        epoch_time = time.time() - start_epoch
+        print('Epoch time: {}sec'.format(epoch_time))
+        print()
+
+    loop_time = time.time() - start_loop
+    print('Total time: {}sec.'.format(loop_time))
 
 
 if __name__ == '__main__':

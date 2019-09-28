@@ -63,24 +63,30 @@ def train(args):
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 
     # ------------- Training loop -----------------
+    start_loop = time.time()
     for e in range(args.epochs):
+        start_epoch = time.time()
+        
         model.train()
         tset.dataset.train()
         for i, (images, labels) in enumerate(tloader):
-            start = time.time()
+            start_batch = time.time()
             images, labels = images.to(device, torch.float32), labels.to(device)
             model.zero_grad()
             logits = model(images)
             loss = criterion(logits, labels)
             loss.backward()
             optimizer.step()
-            step_time = time.time() - start
+            batch_time = time.time() - start_batch
 
-            if i%10 == 0:
+            if i%10 == 0 or i+1 == len(tloader): # ----- Output log -----
                 acc = accuracy(logits, labels)
                 show_progress(e+1, i+1, len(tloader),
                               loss=loss.item(), accuracy=acc,
-                              step_time=step_time)
+                              batch_time=batch_time)
+
+        train_time = time.time() - start_epoch
+        print('\nTraining time: {}.'.format(train_time))
 
         # ------------- Evaluation -----------------
         model.eval()
@@ -93,8 +99,17 @@ def train(args):
             acc = accuracy(logits, labels)
             losses.append(loss.item())
             accs.append(acc)
-        print('\nValidation score: loss: {}, accuracy: {}.'\
-              .format(np.mean(losses), np.mean(accs)))
+
+        val_time = time.time() - start_epoch - train_time
+        print('Validation score: loss: {}, accuracy: {}, time: {}.'\
+              .format(np.mean(losses), np.mean(accs), val_time))
+
+        epoch_time = time.time() - start_epoch
+        print('Epoch time: {}sec'.format(epoch_time))
+        print()
+
+    loop_time = time.time() - start_loop
+    print('Total time: {}sec.'.format(loop_time))
 
 
 if __name__ == '__main__':

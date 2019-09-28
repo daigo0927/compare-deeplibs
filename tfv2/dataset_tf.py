@@ -101,20 +101,20 @@ class Base(metaclass=ABCMeta):
             dataset = tf.data.Dataset.from_tensor_slices(self.samples)
             dataset = dataset.shuffle(len(self))
             self.train_loader = dataset.take(idx)\
-              .map(self.read)\
-              .map(self.preprocess)\
-              .map(self.transform)\
+              .map(self.read, tf.data.experimental.AUTOTUNE)\
+              .map(self.preprocess, tf.data.experimental.AUTOTUNE)\
+              .map(self.transform, tf.data.experimental.AUTOTUNE)\
               .prefetch(self.batch_size)\
               .batch(self.batch_size)
             self.val_loader = dataset.skip(idx)\
-              .map(self.read)\
-              .map(self.preprocess)\
+              .map(self.read, tf.data.experimental.AUTOTUNE)\
+              .map(self.preprocess, tf.data.experimental.AUTOTUNE)\
               .prefetch(self.batch_size)\
               .batch(self.batch_size)
         else:
             self.test_loader = tf.data.Dataset.from_tensor_slices(self.samples)\
-              .map(self.read)\
-              .map(self.preprocess)\
+              .map(self.read, tf.data.experimental.AUTOTUNE)\
+              .map(self.preprocess, tf.data.experimental.AUTOTUNE)\
               .prefetch(self.batch_size)\
               .batch(self.batch_size)
         
@@ -274,6 +274,11 @@ class Cifar10(Base):
                          rotate=rotate,
                          flip_left_right=flip_left_right,
                          flip_up_down=flip_up_down)
+
+    def read(self, imagefile, label):
+        image = tf.io.decode_png(tf.io.read_file(imagefile))
+        image = tf.cast(image, tf.float32)
+        return image, label
 
     def _set_classes(self):
         self.classes = ['airplane',

@@ -59,11 +59,14 @@ def train(args):
             start_batch = time.time()
             loss, acc = train_step(images, labels)
             batch_time = time.time() - start_batch
-            # ----- Output log -----
-            if i%10 == 0:
+            
+            if i%10 == 0 or i+1 == n_batches: # ----- Output log -----
                 show_progress(e+1, i+1, int(n_batches),
                               loss=loss.numpy(), accuracy=acc.numpy(),
                               batch_time=batch_time)
+                
+        train_time = time.time() - start_epoch
+        print('\nTraining time: {}.'.format(train_time))
 
         # -------------- Validation ---------------
         losses, accs = [], []
@@ -72,9 +75,12 @@ def train(args):
             losses.append(loss.numpy())
             accs.append(acc.numpy())
 
+        val_time = time.time() - start_epoch - train_time
+        print('\nValidation score: loss: {}, accuracy: {}, time: {}.'\
+              .format(np.mean(losses), np.mean(accs), val_time))
+
         epoch_time = time.time() - start_epoch
-        print('\nValidation score: loss: {}, accuracy: {}, epoch time: {}.'\
-              .format(np.mean(losses), np.mean(accs), epoch_time))
+        print('The {}epoch took {}sec'.format(e+1, epoch_time))
 
     loop_time = time.time() - start_loop
     print('Total time: {}sec.'.format(loop_time))

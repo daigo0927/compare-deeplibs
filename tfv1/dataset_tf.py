@@ -102,22 +102,22 @@ class Base(metaclass=ABCMeta):
             dataset = tf.data.Dataset.from_tensor_slices(self.samples)
             dataset = dataset.shuffle(len(self))
             self.train_iterator = dataset.take(idx)\
-              .map(self.read)\
-              .map(self.preprocess)\
-              .map(self.transform)\
+              .map(self.read, tf.data.experimental.AUTOTUNE)\
+              .map(self.preprocess, tf.data.experimental.AUTOTUNE)\
+              .map(self.transform, tf.data.experimental.AUTOTUNE)\
               .prefetch(self.batch_size)\
               .batch(self.batch_size)\
               .make_initializable_iterator()
             self.val_iterator = dataset.skip(idx)\
-              .map(self.read)\
-              .map(self.preprocess)\
+              .map(self.read, tf.data.experimental.AUTOTUNE)\
+              .map(self.preprocess, tf.data.experimental.AUTOTUNE)\
               .prefetch(self.batch_size)\
               .batch(self.batch_size)\
               .make_initializable_iterator()
         else:
             self.test_iterator = tf.data.Dataset.from_tensor_slices(self.samples)\
-              .map(self.read)\
-              .map(self.preprocess)\
+              .map(self.read, tf.data.experimental.AUTOTUNE)\
+              .map(self.preprocess, tf.data.experimental.AUTOTUNE)\
               .prefetch(self.batch_size)\
               .batch(self.batch_size)\
               .make_one_shot_iterator()

@@ -75,6 +75,9 @@ def train(args):
                               loss=loss_, accuracy=acc_,
                               batch_time=batch_time)
 
+        train_time = time.time() - start_epoch
+        print('\nTraining time: {}.'.format(train_time))
+
         # -------------- Validation ---------------
         losses, accs = [], []
         sess.run(initialize_val)
@@ -83,9 +86,12 @@ def train(args):
             losses.append(loss_)
             accs.append(acc_)
 
-        epoch_time = time.time() - start_batch
-        print('\nValidation score: loss: {}, accuracy: {}, epoch time: {}'\
-              .format(np.mean(losses), np.mean(accs), epoch_time))
+        val_time = time.time() - start_epoch - train_time
+        print('\nValidation score: loss: {}, accuracy: {}, time: {}'\
+              .format(np.mean(losses), np.mean(accs), val_time))
+
+        epoch_time = time.time() - start_epoch
+        print('The {}epoch took {}sec'.format(e+1, epoch_time))
 
     loop_time = time.time() - start_loop
     print('Total time: {}sec.'.format(loop_time))

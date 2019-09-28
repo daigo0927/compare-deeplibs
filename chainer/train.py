@@ -57,13 +57,16 @@ def train(args):
             optimizer.update()
             batch_time = time.time() - start_batch # --- Stop time measurement >>>
 
-            if i%10 == 0: # --- Output logs -----
+            if i%10 == 0 or i+1 == n_batches: # --- Output logs -----
                 acc = F.accuracy(logits, labels)
                 show_progress(e+1, i+1, int(n_batches),
                               loss=to_cpu(loss.array),
                               accuracy=to_cpu(acc.array),
                               batch_time=batch_time)
             i += 1
+
+        train_time = time.time() - start_epoch
+        print('\nTraining time: {}.'.format(train_time))
 
         # ------------- Validation --------------------
         dataset.eval()
@@ -77,9 +80,12 @@ def train(args):
             losses.append(to_cpu(loss.array))
             accs.append(to_cpu(acc.array))
 
+        val_time = time.time() - start_epoch - train_time
+        print('\nValidation score: loss: {}, accuracy: {}, time: {}.'\
+              .format(np.mean(losses), np.mean(accs), val_time))
+
         epoch_time = time.time() - start_epoch
-        print('\nValidation score: loss: {}, accuracy: {}, epoch time: {}.'\
-              .format(np.mean(losses), np.mean(accs), epoch_time))
+        print('The {}epoch took {}sec'.format(e+1, epoch_time))
 
     loop_time = time.time() - start_loop
     print('Total time: {}sec.'.format(loop_time))

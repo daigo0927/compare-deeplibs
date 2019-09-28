@@ -81,11 +81,12 @@ def train(args):
             accs.append(to_cpu(acc.array))
 
         val_time = time.time() - start_epoch - train_time
-        print('\nValidation score: loss: {}, accuracy: {}, time: {}.'\
+        print('Validation score: loss: {}, accuracy: {}, time: {}.'\
               .format(np.mean(losses), np.mean(accs), val_time))
 
         epoch_time = time.time() - start_epoch
-        print('The {}epoch took {}sec'.format(e+1, epoch_time))
+        print('Epoch time {}sec'.format(epoch_time))
+        print()
 
     loop_time = time.time() - start_loop
     print('Total time: {}sec.'.format(loop_time))

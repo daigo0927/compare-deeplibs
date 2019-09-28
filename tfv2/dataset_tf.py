@@ -275,6 +275,11 @@ class Cifar10(Base):
                          flip_left_right=flip_left_right,
                          flip_up_down=flip_up_down)
 
+    def read(self, imagefile, label):
+        image = tf.io.decode_png(tf.io.read_file(imagefile))
+        image = tf.cast(image, tf.float32)
+        return image, label
+
     def _set_classes(self):
         self.classes = ['airplane',
 			'automobile',

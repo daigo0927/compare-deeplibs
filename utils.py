@@ -33,7 +33,7 @@ def prepare_parser():
                         help='Batch size [64]')
     parser.add_argument('-v', '--validation_split', type=float, default=0.1,
                         help='Validtion split ratio [0.1]')
-    papass.add_argument('-cs', '--check_step', type=int, default=100,
+    parser.add_argument('-cs', '--check_step', type=int, default=100,
                         help='Step size for progress check [100]')
     # Data pipeline configs
     parser.add_argument('--resize_shape', nargs=2, type=int, default=[32, 32],

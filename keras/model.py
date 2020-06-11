@@ -52,6 +52,6 @@ def get_resnet_mini(input_shape, num_classes):
         ResBlock(128, strides=2),
         ResBlock(128),
         layers.GlobalAvgPool2D(),
-        layers.Dense(num_classes, activation='softmax')
+        layers.Dense(num_classes)
     ])
     return model

@@ -21,15 +21,15 @@ def train(dataset_dir, batch_size, learning_rate, epochs):
     model.summary()
 
     optimizer = tf.keras.optimizers.Adam(lr=learning_rate)
-    loss_fn = tf.keras.losses.SparseCategoricalCrossentropy()
+    loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     metric = tf.keras.metrics.SparseCategoricalAccuracy()
 
     @tf.function
     def train_step(x, y):
         with tf.GradientTape() as tape:
-            preds = model(x, training=True)
-            loss = loss_fn(y, preds)
-            metric.update_state(y, preds)
+            logits = model(x, training=True)
+            loss = loss_fn(y, logits)
+            metric.update_state(y, logits)
             gradients = tape.gradient(loss, model.trainable_weights)
         optimizer.apply_gradients(zip(gradients, model.trainable_weights))
         return loss
@@ -38,7 +38,7 @@ def train(dataset_dir, batch_size, learning_rate, epochs):
         for i, (images, labels) in enumerate(tqdm(dataset)):
             loss = train_step(images, labels)
         accuracy = metric.result().numpy()
-        print(f'Epoch: {epoch}, accuracy: {accuracy}')
+        print(f'Epoch: {e+1}/{epochs}, accuracy: {accuracy}')
         metric.reset_states()
 
 

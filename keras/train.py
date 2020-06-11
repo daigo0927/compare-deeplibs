@@ -20,8 +20,8 @@ def train(dataset_dir, batch_size, learning_rate, epochs):
     model.summary()
 
     optimizer = tf.keras.optimizers.Adam(lr=learning_rate)
-    loss = tf.keras.losses.SparseCategoricalCrossentropy()
-    metrics = [tf.keras.metrics.sparse_categorical_accuracy]
+    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    metrics = [tf.keras.metrics.SparseCategoricalAccuracy()]
     model.compile(optimizer, loss, metrics)
 
     model.fit(dataset, epochs=epochs)

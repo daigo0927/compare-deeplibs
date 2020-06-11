@@ -40,7 +40,7 @@ def train(dataset_dir, batch_size, learning_rate, epochs, num_workers):
             optimizer.step()
 
             running_acc += accuracy(logits, labels)
-        print(f'Epoch: {epoch}, accuracy: {running_acc/(i+1)}')
+        print(f'Epoch: {e+1}/{epochs}, accuracy: {running_acc/(i+1)}')
 
 
 if __name__ == '__main__':
